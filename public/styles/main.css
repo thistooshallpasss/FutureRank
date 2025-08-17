@@ -1,0 +1,232 @@
+/* Basic reset and body styling */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f7f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Container for predictor pages */
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h1,
+h2,
+h3 {
+    color: #1a253c;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+input[type="number"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    /* Important for padding */
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Result Card Styling */
+.result-card,
+.result-card-special {
+    background-color: #eef7ff;
+    border-left: 5px solid #007bff;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 4px;
+}
+
+.result-card-special {
+    border-left-color: #ffc107;
+}
+
+.error {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+
+/* Container for the action buttons that appear after prediction */
+.action-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allows buttons to stack on small screens */
+    gap: 10px;
+    /* Space between buttons */
+    margin-top: 25px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 20px;
+}
+
+.action-btn {
+    flex-grow: 1;
+    /* Allows buttons to share space equally */
+    text-align: center;
+    padding: 10px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+/* Primary action button (e.g., predict college) */
+.btn-primary {
+    background-color: #28a745;
+    /* Green */
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #218838;
+}
+
+/* Secondary action button (e.g., go to dashboard) */
+.btn-secondary {
+    background-color: #6c757d;
+    /* Gray */
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Tertiary action button (e.g., predict again) */
+.btn-tertiary {
+    background-color: #f0f0f0;
+    /* Light Gray */
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.btn-tertiary:hover {
+    background-color: #e0e0e0;
+}
+/* Styling for the main predictor page container */
+.predictor-container {
+    max-width: 900px;
+    /* Wider container for two columns */
+}
+
+/* Two-column layout using Flexbox */
+.predictor-layout {
+    display: flex;
+    gap: 2rem;
+    /* Space between the left and right panels */
+}
+
+.left-panel {
+    flex: 1;
+    /* Takes up 1 part of the available space */
+}
+
+.right-panel {
+    flex: 1;
+    /* Takes up 1 part of the available space */
+    border-left: 1px solid #e0e0e0;
+    padding-left: 2rem;
+}
+
+.placeholder-text {
+    color: #888;
+    font-style: italic;
+}
+
+/* Renamed the main predict button for clarity */
+.predict-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.predict-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Updated styles for the persistent button container */
+.action-buttons-container {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.action-btn {
+    display: block;
+    /* Make each button take the full width */
+    width: 100%;
+    box-sizing: border-box;
+    /* Important for padding and width */
+    margin-bottom: 10px;
+    /* Space between vertical buttons */
+}
+
+.action-btn:last-child {
+    margin-bottom: 0;
+}
+
+/* Style for the disabled button */
+.action-btn.disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    pointer-events: none;
+    /* Prevents clicks */
+}
+
+/* Responsive Design: Stack columns on smaller screens */
+@media (max-width: 768px) {
+    .predictor-layout {
+        flex-direction: column;
+    }
+
+    .right-panel {
+        border-left: none;
+        padding-left: 0;
+        margin-top: 2rem;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 2rem;
+    }
+}
