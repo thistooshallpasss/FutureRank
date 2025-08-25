@@ -66,6 +66,9 @@ To run this project locally, follow these steps:
 
 ## The Heart of the Project: The Data Generation Journey
 
+![Dashboard](<Screenshot 2025-08-25 at 18.46.06.png>)
+![Jee Mains](<Screenshot 2025-08-25 at 18.46.17.png>) ![Jee Score Prediction](<Screenshot 2025-08-25 at 18.46.38.png>) ![Jee Advanced Score Prediction](<Screenshot 2025-08-25 at 18.47.08.png>)
+
 A core challenge of this project was the lack of clean, structured, and comprehensive public datasets. To overcome this, we adopted a **programmatic data generation** approach using Python, allowing us to create realistic and highly detailed datasets tailored to our specific needs.
 
 ### 1\. JEE Mains Rank Dataset
