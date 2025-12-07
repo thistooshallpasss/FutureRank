@@ -11,9 +11,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 3. Middleware
-app.use(cors()); // Enable Cross-Origin Resource Sharing
-app.use(express.json()); // To parse JSON request bodies
-app.use(express.static('public')); // To serve your HTML, CSS, JS files
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
 
 // 4. Database Connection Pool
 const dbPool = mysql.createPool({
@@ -28,114 +28,157 @@ const dbPool = mysql.createPool({
 
 // 5. API Endpoints (The Core Logic)
 
-// === JEE MAINS RANK PREDICTOR ENDPOINT (UPDATED) ===
+
+// ======================================================================
+// === UPDATED JEE MAINS RANK PREDICTOR (Bug #3, #7, #19 FIXED) ===
+// ======================================================================
 app.post('/api/predict-mains-rank', async (req, res) => {
     try {
-        // 1. Now receiving pwd_status from the frontend
         const { marks, category, gender, pwd_status } = req.body;
 
-        if (marks === undefined || !category || !gender || !pwd_status) {
-            return res.status(400).json({ error: 'Missing required fields.' });
+        // Bug #3, #7 — Strict validation
+        if (
+            marks === undefined ||
+            marks === null ||
+            isNaN(marks) ||
+            !category ||
+            !gender ||
+            !pwd_status
+        ) {
+            return res.status(400).json({
+                error: 'Invalid or missing fields. Marks must be a number.'
+            });
         }
-        
-        const latestYear = 2025;
 
-        // 2. Updated SQL query to select the new MIN/MAX columns and use PWD_STATUS
         const sqlQuery = `
-            SELECT 
-                EXPECTED_GENERAL_RANK_MIN, EXPECTED_GENERAL_RANK_MAX, 
-                EXPECTED_CATEGORY_RANK_MIN, EXPECTED_CATEGORY_RANK_MAX 
-            FROM jee_mains_ranks 
-            WHERE MARKS_SCORED = ? AND CATEGORY = ? AND GENDER = ? AND PWD_STATUS = ? AND YEAR = ?
+            SELECT EXPECTED_GENERAL_RANK_MIN, EXPECTED_GENERAL_RANK_MAX,
+                   EXPECTED_CATEGORY_RANK_MIN, EXPECTED_CATEGORY_RANK_MAX
+            FROM jee_mains_ranks
+            WHERE MARKS_SCORED = ? AND CATEGORY = ? AND GENDER = ? AND PWD_STATUS = ? AND YEAR = 2025
         `;
 
-        // 3. Added pwd_status to the query parameters
-        const [results] = await dbPool.execute(sqlQuery, [marks, category, gender, pwd_status, latestYear]);
+        const [results] = await dbPool.execute(sqlQuery, [
+            marks, category, gender, pwd_status
+        ]);
 
         if (results.length > 0) {
-            res.json(results[0]);
+            return res.json(results[0]);
         } else {
-            res.status(404).json({ message: 'No rank data found for the provided inputs. Please check the marks.' });
+            // Bug #19
+            return res.status(404).json({
+                message: 'No data found. This combination of category/marks might be invalid.'
+            });
         }
 
     } catch (error) {
         console.error('Database Error:', error);
-        res.status(500).json({ error: 'An internal server error occurred.' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-// === JEE ADVANCED RANK PREDICTOR ENDPOINT (UPDATED) ===
+
+// ======================================================================
+// === UPDATED JEE ADVANCED RANK PREDICTOR ===
+// ======================================================================
 app.post('/api/predict-advanced-rank', async (req, res) => {
     try {
         const { marks, category, gender, pwd_status } = req.body;
 
-        if (marks === undefined || !category || !gender || !pwd_status) {
-            return res.status(400).json({ error: 'Missing required fields.' });
+        if (
+            marks === undefined ||
+            marks === null ||
+            isNaN(marks) ||
+            !category ||
+            !gender ||
+            !pwd_status
+        ) {
+            return res.status(400).json({ error: 'Missing or invalid fields.' });
         }
 
-        const latestYear = 2025;
-
-        // 1. Updated SQL query to select the new MIN/MAX columns
         const sqlQuery = `
-            SELECT 
-                EXPECTED_GENERAL_RANK_MIN, EXPECTED_GENERAL_RANK_MAX, 
-                EXPECTED_CATEGORY_RANK_MIN, EXPECTED_CATEGORY_RANK_MAX
-            FROM jee_advanced_ranks 
-            WHERE MARKS_SCORED = ? AND CATEGORY = ? AND GENDER = ? AND PWD_STATUS = ? AND YEAR = ?
+            SELECT EXPECTED_GENERAL_RANK_MIN, EXPECTED_GENERAL_RANK_MAX,
+                   EXPECTED_CATEGORY_RANK_MIN, EXPECTED_CATEGORY_RANK_MAX
+            FROM jee_advanced_ranks
+            WHERE MARKS_SCORED = ? AND CATEGORY = ? AND GENDER = ? AND PWD_STATUS = ? AND YEAR = 2025
         `;
 
-        const [results] = await dbPool.execute(sqlQuery, [marks, category, gender, pwd_status, latestYear]);
+        const [results] = await dbPool.execute(sqlQuery, [
+            marks, category, gender, pwd_status
+        ]);
 
         if (results.length > 0) {
-            // Check if the rank is 0 (Not Qualified)
+
+            // Not qualified case
             if (results[0].EXPECTED_GENERAL_RANK_MIN === 0) {
-                return res.json({ message: 'Not Qualified for Rank List based on the provided marks.' });
+                return res.json({
+                    message: "Not Qualified for Rank List based on the provided marks."
+                });
             }
-            res.json(results[0]);
+
+            return res.json(results[0]);
         } else {
-            res.status(404).json({ message: 'No rank data found. Marks might be below the cutoff range.' });
+            return res.status(404).json({
+                message: 'No rank data found. Marks may be below cutoff.'
+            });
         }
 
     } catch (error) {
         console.error('Database Error:', error);
-        res.status(500).json({ error: 'An internal server error occurred.' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
 
-// Add this new endpoint to your server.js file
-
-// === JEE MAINS PERCENTILE PREDICTOR ENDPOINT ===
+// ======================================================================
+// === JEE MAINS PERCENTILE PREDICTOR ===
+// ======================================================================
 app.post('/api/predict-mains-percentile', async (req, res) => {
     try {
         const { marks, session, shift } = req.body;
 
-        // Basic validation
-        if (marks === undefined || !session || !shift) {
-            return res.status(400).json({ error: 'Missing required fields.' });
+        if (
+            marks === undefined ||
+            marks === null ||
+            isNaN(marks) ||
+            !session ||
+            !shift
+        ) {
+            return res.status(400).json({ error: 'Missing or invalid fields.' });
         }
-        
-        // We'll query the latest year's data (2025)
-        const latestYear = 2025;
 
         const sqlQuery = `
-            SELECT EXPECTED_PERCENTILE 
-            FROM jee_mains_percentile_data 
-            WHERE MARKS_SCORED = ? AND SESSION = ? AND SHIFT = ? AND YEAR = ?
+            SELECT EXPECTED_PERCENTILE
+            FROM jee_mains_percentile_data
+            WHERE MARKS_SCORED = ? AND SESSION = ? AND SHIFT = ? AND YEAR = 2025
         `;
 
-        const [results] = await dbPool.execute(sqlQuery, [marks, session, shift, latestYear]);
+        const [results] = await dbPool.execute(sqlQuery, [
+            marks, session, shift
+        ]);
 
         if (results.length > 0) {
-            res.json(results[0]); // Send back the found percentile
+            return res.json(results[0]);
         } else {
-            res.status(404).json({ message: 'No percentile data found for the provided inputs. Please check the marks.' });
+            return res.status(404).json({
+                message: 'No percentile data found for the provided inputs.'
+            });
         }
 
     } catch (error) {
         console.error('Database Error:', error);
-        res.status(500).json({ error: 'An internal server error occurred.' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
+});
+
+
+// ======================================================================
+// === MISSING COLLEGE ROUTE (Bug #10 FIXED) ===
+// ======================================================================
+app.get('/api/college-list', async (req, res) => {
+    // Basic placeholder to prevent frontend crashes
+    res.json({
+        message: "College prediction feature coming soon!"
+    });
 });
 
 
